@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "userutils"
+description = ""
+version = "0.0.1"
+authors = ["Slava Petrov <slavapmk@gmail.com>"]
+packages = [{ include = "userutils", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyrogram = "^2.0.106"
+dataclasses-json = "^0.6.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+userutils = "userutils.main:entrypoint"
