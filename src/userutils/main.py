@@ -1,4 +1,6 @@
 import asyncio
+import random
+from asyncio import sleep
 
 from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
@@ -34,22 +36,26 @@ async def general_task():
     @app.on_message(filters.me)
     async def on_my_message(_, event: Message):
         if event.text == '@all':
-            if event.chat.type not in (ChatType.PRIVATE, ChatType.BOT, ChatType.CHANNEL):
-                ans = []
-                async for member in event.chat.get_members():
-                    if member.user.id == app.me.id:
-                        continue
-                    if len(member.user.username) != 0:
-                        name = f'@{member.user.username}'
-                    else:
-                        name = f'@{member.user.first_name}'
-                    ans.append(
-                        Link(f'tg://user?id={member.user.id}', name, ParseMode.MARKDOWN)
-                    )
+            if event.chat.type in [ChatType.PRIVATE, ChatType.BOT, ChatType.CHANNEL]:
+                return
+            ans = []
+            async for member in event.chat.get_members():
+                if member.user.id == app.me.id or member.user.is_bot:
+                    continue
+                if member.user.username is None or len(member.user.username) != 0:
+                    name = f'@{member.user.username}'
+                else:
+                    name = str(member.user.first_name)
+                ans.append(
+                    Link(f'tg://user?id={member.user.id}', name, ParseMode.MARKDOWN)
+                )
 
-                for chunk in chunks(ans, 5):
-                    await app.send_message(event.chat.id, ' '.join(chunk))
-                await event.delete()
+            await event.delete()
+            for chunk in chunks(ans, 5):
+                await app.send_message(event.chat.id, ' '.join(chunk))
+                await sleep(
+                    random.randrange(5, 15) / 10
+                )
 
     # @app.on_deleted_messages()
     # async def on_deleted_message(_, event: list[Message]):
