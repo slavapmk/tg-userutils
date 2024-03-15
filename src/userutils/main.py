@@ -9,6 +9,12 @@ from userutils.data import storage
 from userutils.data.storage import config
 
 
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
 async def general_task():
     await storage.load()
     storage.check_file_parent('storage/sessions/check')
@@ -26,7 +32,7 @@ async def general_task():
     await app.start()
 
     @app.on_message(filters.me)
-    async def test(_, event: Message):
+    async def on_my_message(_, event: Message):
         if event.text == '@all':
             if event.chat.type not in (ChatType.PRIVATE, ChatType.BOT, ChatType.CHANNEL):
                 ans = []
@@ -34,17 +40,33 @@ async def general_task():
                     if member.user.id == app.me.id:
                         continue
                     if len(member.user.username) != 0:
-                        ans.append(
-                            Link(f'tg://user?id={member.user.id}', f'@{member.user.username}', ParseMode.MARKDOWN)
-                        )
+                        name = f'@{member.user.username}'
                     else:
-                        ans.append(
-                            Link(f'tg://user?id={member.user.id}', f'@{member.user.first_name}', ParseMode.MARKDOWN)
-                        )
-                await event.edit_text(' '.join(ans))
-        else:
-            text = event.text
-            print(text)
+                        name = f'@{member.user.first_name}'
+                    ans.append(
+                        Link(f'tg://user?id={member.user.id}', name, ParseMode.MARKDOWN)
+                    )
+
+                for chunk in chunks(ans, 5):
+                    await app.send_message(event.chat.id, ' '.join(chunk))
+                await event.delete()
+
+    # @app.on_deleted_messages()
+    # async def on_deleted_message(_, event: list[Message]):
+    #     for event_message in event:
+    #         try:
+    #             if event_message.chat is not None and event_message.chat.type in [ChatType.CHANNEL, ChatType.BOT]:
+    #                 continue
+    #             await app.send_message(
+    #                 # config.data.archive_chat,
+    #                 'me',
+    #                 f'CHAT #{event_message.chat.id} - {event_message.chat.first_name}\n'
+    #                 f'FROM #{event_message.from_user.id} - ' + ' '.join(
+    #                     [event_message.from_user.first_name, event.from_user.last_name])
+    #             )
+    #             await event_message.copy(config.data.archive_chat)
+    #         except AttributeError as e:
+    #             print(event_message)
 
 
 def entrypoint():
