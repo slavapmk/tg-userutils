@@ -1,6 +1,7 @@
 import asyncio
 import random
 from asyncio import sleep
+from typing import Coroutine
 
 from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
@@ -56,6 +57,43 @@ async def general_task():
                 await sleep(
                     random.randrange(5, 15) / 10
                 )
+
+    async def sleep_and_do(time, action: Coroutine):
+        await asyncio.sleep(time)
+        await action
+
+    async def process_1h():
+        await app.send_message(
+            -1001991594892,
+            '/dick'
+        )
+        _ = asyncio.create_task(sleep_and_do(
+            3601, process_1h()
+        ))
+
+    async def process_10m():
+        await app.send_message(
+            -1001991594892,
+            'Дроч',
+            reply_to_message_id=3130
+        )
+        _ = asyncio.create_task(sleep_and_do(
+            601, process_10m()
+        ))
+
+    async def process_24h():
+        await app.send_message(
+            -1001874841071,
+            '/grow',
+            reply_to_message_id=14071
+        )
+        _ = asyncio.create_task(sleep_and_do(
+            2073601, process_24h()
+        ))
+
+    _ = asyncio.create_task(process_1h())
+    _ = asyncio.create_task(process_10m())
+    _ = asyncio.create_task(process_24h())
 
     # @app.on_deleted_messages()
     # async def on_deleted_message(_, event: list[Message]):
