@@ -1,8 +1,8 @@
 import asyncio
 import random
 from asyncio import sleep
-from typing import Coroutine
 
+import aiocron
 from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
 from pyrogram.types import Message
@@ -58,59 +58,28 @@ async def general_task():
                     random.randrange(5, 15) / 10
                 )
 
-    async def sleep_and_do(time, action: Coroutine):
-        await asyncio.sleep(time)
-        await action
-
-    async def process_1h():
-        await app.send_message(
-            -1001991594892,
-            '/dick'
-        )
-        _ = asyncio.create_task(sleep_and_do(
-            3601, process_1h()
-        ))
-
+    @aiocron.crontab('*/10 * * * *')
     async def process_10m():
         await app.send_message(
             -1001991594892,
             'Дроч',
             reply_to_message_id=3130
         )
-        _ = asyncio.create_task(sleep_and_do(
-            601, process_10m()
-        ))
 
+    @aiocron.crontab('0 * * * *')
+    async def process_1h():
+        await app.send_message(
+            -1001991594892,
+            '/dick'
+        )
+
+    @aiocron.crontab('0 0 * * *')
     async def process_24h():
         await app.send_message(
             -1001874841071,
             '/grow',
             reply_to_message_id=14071
         )
-        _ = asyncio.create_task(sleep_and_do(
-            2073601, process_24h()
-        ))
-
-    _ = asyncio.create_task(process_1h())
-    _ = asyncio.create_task(process_10m())
-    _ = asyncio.create_task(process_24h())
-
-    # @app.on_deleted_messages()
-    # async def on_deleted_message(_, event: list[Message]):
-    #     for event_message in event:
-    #         try:
-    #             if event_message.chat is not None and event_message.chat.type in [ChatType.CHANNEL, ChatType.BOT]:
-    #                 continue
-    #             await app.send_message(
-    #                 # config.data.archive_chat,
-    #                 'me',
-    #                 f'CHAT #{event_message.chat.id} - {event_message.chat.first_name}\n'
-    #                 f'FROM #{event_message.from_user.id} - ' + ' '.join(
-    #                     [event_message.from_user.first_name, event.from_user.last_name])
-    #             )
-    #             await event_message.copy(config.data.archive_chat)
-    #         except AttributeError as e:
-    #             print(event_message)
 
 
 def entrypoint():

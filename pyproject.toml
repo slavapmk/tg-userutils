@@ -11,6 +11,7 @@ pyrogram = "^2.0.106"
 dataclasses-json = "^0.6.4"
 aiofiles = "^23.2.1"
 TgCrypto = "^1.2.5"
+aiocron = "^1.8"
 
 [build-system]
 requires = ["poetry-core"]
