@@ -66,6 +66,7 @@ async def general_task():
             -1002053312362,
             'Дроч'
         )
+        await sleep(3)
         await app.read_chat_history(-1002053312362)
 
     @aiocron.crontab('0 * * * *')
