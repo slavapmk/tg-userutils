@@ -57,19 +57,20 @@ async def general_task():
                 await sleep(
                     random.randrange(5, 15) / 10
                 )
+        elif event.text == '!stop confirm':
+            exit(0)
 
     @aiocron.crontab('*/10 * * * *')
     async def process_10m():
         await app.send_message(
-            -1001991594892,
-            'Дроч',
-            reply_to_message_id=3130
+            -1002053312362,
+            'Дроч'
         )
 
     @aiocron.crontab('0 * * * *')
     async def process_1h():
         await app.send_message(
-            -1001991594892,
+            -1002053312362,
             '/dick'
         )
 
