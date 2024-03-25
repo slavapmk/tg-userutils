@@ -12,6 +12,8 @@ from pyrogram.types.user_and_chats.user import Link
 from userutils.data import storage
 from userutils.data.storage import config
 
+drauch_chat = -1002053312362
+
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -22,7 +24,7 @@ def chunks(lst, n):
 async def general_task():
     await storage.load()
     storage.check_file_parent('storage/sessions/check')
-    app = Client(
+    client = Client(
         config.data.login_phone.replace('+', ''),
         config.data.api_id,
         config.data.api_hash,
@@ -33,16 +35,16 @@ async def general_task():
         password=config.data.login_password,
         workdir='storage/sessions/'
     )
-    await app.start()
+    await client.start()
 
-    @app.on_message(filters.me)
+    @client.on_message(filters.me)
     async def on_my_message(_, event: Message):
         if event.text == '@all':
             if event.chat.type in [ChatType.PRIVATE, ChatType.BOT, ChatType.CHANNEL]:
                 return
             ans = []
             async for member in event.chat.get_members():
-                if member.user.id == app.me.id or member.user.is_bot:
+                if member.user.id == client.me.id or member.user.is_bot:
                     continue
                 if member.user.username is None or len(member.user.username) != 0:
                     name = f'@{member.user.username}'
@@ -54,40 +56,41 @@ async def general_task():
 
             await event.delete()
             for chunk in chunks(ans, 5):
-                await app.send_message(event.chat.id, ' '.join(chunk))
+                await client.send_message(event.chat.id, ' '.join(chunk))
                 await sleep(
                     random.randrange(5, 15) / 10
                 )
         elif event.text == '!stop confirm':
             exit(0)
 
+    peer = await client.resolve_peer(drauch_chat)
+
     @aiocron.crontab('*/10 * * * *')
     async def process_10m():
-        await app.send_message(
-            -1002053312362,
+        await client.send_message(
+            drauch_chat,
             'Дроч'
-        )
-        await sleep(3)
-        await app.read_chat_history(-1002053312362)
-        peer = await app.resolve_peer(-1002053312362)
-        await app.invoke(
-            ReadMentions(peer=peer)
         )
 
     @aiocron.crontab('0 * * * *')
     async def process_1h():
-        await app.send_message(
-            -1002053312362,
+        await client.send_message(
+            drauch_chat,
             '/dick'
         )
 
     @aiocron.crontab('0 0 * * *')
     async def process_24h():
-        await app.send_message(
+        await client.send_message(
             -1001874841071,
             '/grow',
             reply_to_message_id=14071
         )
+
+    @client.on_message(filters.chat(drauch_chat))
+    async def on_message(_client: Client, _message: Message):
+        await client.read_chat_history(drauch_chat)
+        await client.invoke(ReadMentions(peer=peer))
 
 
 def entrypoint():
