@@ -5,6 +5,7 @@ from asyncio import sleep
 import aiocron
 from pyrogram import Client, filters
 from pyrogram.enums import ChatType, ParseMode
+from pyrogram.raw.functions.messages import ReadMentions
 from pyrogram.types import Message
 from pyrogram.types.user_and_chats.user import Link
 
@@ -68,6 +69,10 @@ async def general_task():
         )
         await sleep(3)
         await app.read_chat_history(-1002053312362)
+        peer = await app.resolve_peer(-1002053312362)
+        await app.invoke(
+            ReadMentions(peer=peer)
+        )
 
     @aiocron.crontab('0 * * * *')
     async def process_1h():
