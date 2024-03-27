@@ -1,6 +1,7 @@
 import asyncio
 import random
 from asyncio import sleep
+from datetime import datetime, timedelta
 
 import aiocron
 from pyrogram import Client, filters
@@ -12,7 +13,9 @@ from pyrogram.types.user_and_chats.user import Link
 from userutils.data import storage
 from userutils.data.storage import config
 
-drauch_chat = -1002053312362
+fap_chat = -1002053312362
+ege_chat = 'self'
+# ege_chat = -1001707241381
 
 
 def chunks(lst, n):
@@ -63,33 +66,43 @@ async def general_task():
         elif event.text == '!stop confirm':
             exit(0)
 
-    peer = await client.resolve_peer(drauch_chat)
+    peer = await client.resolve_peer(fap_chat)
 
     @aiocron.crontab('*/10 * * * *')
-    async def process_10m():
+    async def process_fap():
         await client.send_message(
-            drauch_chat,
+            fap_chat,
             'Дроч'
         )
 
     @aiocron.crontab('0 * * * *')
-    async def process_1h():
+    async def process_dick():
         await client.send_message(
-            drauch_chat,
+            fap_chat,
             '/dick'
         )
 
     @aiocron.crontab('0 0 * * *')
-    async def process_24h():
+    async def process_grow():
         await client.send_message(
             -1001874841071,
             '/grow',
             reply_to_message_id=14071
         )
 
-    @client.on_message(filters.chat(drauch_chat))
+    ege_date = datetime(2024, 5, 28)
+
+    @aiocron.crontab('* 0 * * *')
+    async def process_ege():
+        delta: timedelta = datetime.now() - ege_date
+        await client.send_message(
+            ege_chat,
+            f'Кайфуем, у нас ещё {delta.days}д отдыха'
+        )
+
+    @client.on_message(filters.chat(fap_chat))
     async def on_message(_client: Client, _message: Message):
-        await client.read_chat_history(drauch_chat)
+        await client.read_chat_history(fap_chat)
         await client.invoke(ReadMentions(peer=peer))
 
 
