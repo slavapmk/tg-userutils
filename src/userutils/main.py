@@ -92,7 +92,7 @@ async def general_task():
 
     ege_date = datetime(2024, 5, 28)
 
-    @aiocron.crontab('* 0 * * *')
+    @aiocron.crontab('* * * * *')
     async def process_ege():
         delta: timedelta = datetime.now() - ege_date
         await client.send_message(
