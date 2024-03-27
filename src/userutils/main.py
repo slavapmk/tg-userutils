@@ -14,8 +14,7 @@ from userutils.data import storage
 from userutils.data.storage import config
 
 fap_chat = -1002053312362
-ege_chat = 'self'
-# ege_chat = -1001707241381
+ege_chat = -1001707241381
 
 
 def chunks(lst, n):
@@ -92,9 +91,9 @@ async def general_task():
 
     ege_date = datetime(2024, 5, 28)
 
-    @aiocron.crontab('* * * * *')
+    @aiocron.crontab('0 0 * * *')
     async def process_ege():
-        delta: timedelta = datetime.now() - ege_date
+        delta: timedelta = ege_date - datetime.now()
         await client.send_message(
             ege_chat,
             f'Кайфуем, у нас ещё {delta.days}д отдыха'
